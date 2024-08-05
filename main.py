@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel
 from uuid import UUID, uuid4
 from typing import List
@@ -41,10 +41,21 @@ def get_todo_by_id(todo_id: UUID):
     for todo in todos:
         if todo.id == todo_id:
             return todo
-    return HTTPException(status_code=404, detail="Todo not found")
+    raise HTTPException(status_code=404, detail="Todo not found")
 
 @app.post("/todos", response_model=ToDoInDB, status_code=201)
 def create_todo(todo: Todo):
     new_todo = ToDoInDB(id=uuid4(), **todo.model_dump())
     todos.append(new_todo)
     return new_todo 
+
+@app.put("/todo/{todo_id}", status_code=204)
+def update_todo(todo_id: UUID, updated_todo: Todo):
+    for todo in todos:
+        if todo.id == todo_id:
+            todo.title = updated_todo.title
+            todo.description = updated_todo.description
+            todo.completed = updated_todo.completed
+            return
+    raise HTTPException(status_code=404, detail="Todo not found")  
+
