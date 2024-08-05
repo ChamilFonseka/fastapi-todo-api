@@ -59,3 +59,10 @@ def update_todo(todo_id: UUID, updated_todo: Todo):
             return
     raise HTTPException(status_code=404, detail="Todo not found")  
 
+@app.delete("/todos/{todo_id}", status_code=204)
+def delete_todo(todo_id: UUID):
+    for todo in todos:
+        if todo.id == todo_id:
+            todos.remove(todo)
+            return
+    raise HTTPException(status_code=404, detail="Todo not found")
