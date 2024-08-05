@@ -31,7 +31,7 @@ def generate_sample_data():
     todos.append(ToDoInDB(id=uuid4(), title="Build an API", description="Need to build an API using FastAPI"))
     todos.append(ToDoInDB(id=uuid4(), title="Deploy the API", description="Need to deploy the API on the cloud"))
 
-@app.get("/todos/", response_model=List[ToDoInDB])
+@app.get("/todos", response_model=List[ToDoInDB])
 def get_todos():
     return todos
 
@@ -42,3 +42,9 @@ def get_todo_by_id(todo_id: UUID):
         if todo.id == todo_id:
             return todo
     return HTTPException(status_code=404, detail="Todo not found")
+
+@app.post("/todos", response_model=ToDoInDB, status_code=201)
+def create_todo(todo: Todo):
+    new_todo = ToDoInDB(id=uuid4(), **todo.model_dump())
+    todos.append(new_todo)
+    return new_todo 
